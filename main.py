@@ -12,6 +12,7 @@ import time
 
 driver1 = webdriver.Chrome()
 # driver2 = webdriver.Chrome()
+
 # Scrape True Value Odds
 driver1.get("https://www.pinnacle.com/en/basketball/nba/matchups/#period:0")
 viewPropBtn = WebDriverWait(driver1, 10).until(
@@ -23,25 +24,23 @@ div_elements = WebDriverWait(driver1, 10).until(
     EC.presence_of_all_elements_located((By.XPATH, '//div[@data-collapsed="true" and @data-test-id="Collapse" and contains(@class, "style_marketGroup")]'))
 )
 
+player_props_html = []
 player_props = []
 criteria = [
-    "Money Line – 1st Half", "Handicap – 1st Half", "Total – 1st Half","Team Total – 1st Half", 
-    "Money Line – 1st Quarter", "Handicap – 1st Quarter", "Total – 1st Quarter", "Team Total – 1st Quarter", 
-    "Money Line – 2nd Quarter", "Handicap – 2nd Quarter", "Total – 2nd Quarter", "Team Total – 2nd Quarter"
+    "(Points)","(Pts+Reb+Asts)","(Rebounds)", "(3 Point FG)","(Assists)","(Double+Double)"
     ]
 
 for div_element in div_elements:
     # Find the nested span element
     span_element = div_element.find_element(By.XPATH, '//div/span')
     # Get the text content of the span element
-    span_text = span_element.text
     # Check if the text content meets the criteria
-    if span_text not in criteria:
-        player_props.append(div_element)
-for player_prop in player_props:
+    player_props_html.append(div_element)
+for player_prop in player_props_html:
     span_element = player_prop.find_element(By.XPATH, './div/span[1]')
     span_text = span_element.text
-    print(span_text)
+    if any(substring.lower() in span_text.lower() for substring in criteria):
+        player_props.append(span_text)
 print(player_props)
 
 
