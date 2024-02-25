@@ -14,7 +14,7 @@ driver1 = webdriver.Chrome()
 # driver2 = webdriver.Chrome()
 
 # Scrape True Value Odds
-driver1.get("https://www.pinnacle.com/en/basketball/nba/matchups/#period:0")
+driver1.get("https://www.pinnacle.com/en/basketball/matchups/")
 viewPropBtn = WebDriverWait(driver1, 10).until(
     EC.element_to_be_clickable((By.CLASS_NAME, "style_btn__3I6l1"))
 )
@@ -23,11 +23,11 @@ viewPropBtn.click()
 div_elements = WebDriverWait(driver1, 10).until(
     EC.presence_of_all_elements_located((By.XPATH, '//div[@data-collapsed="true" and @data-test-id="Collapse" and contains(@class, "style_marketGroup")]'))
 )
-
+df = pd.DataFrame(columns=['Player', 'Prop', 'Line', 'Over', 'Under'])
 player_props_html = []
 player_props = []
 criteria = [
-    "(Points)","(Pts+Reb+Asts)","(Rebounds)", "(3 Point FG)","(Assists)","(Double+Double)"
+    "(Points)","(Pts+Rebs+Asts)","(Rebounds)", "(3 Point FG)","(Assists)","(Double+Double)","(Triple+Double)"
     ]
 
 for div_element in div_elements:
@@ -40,8 +40,19 @@ for player_prop in player_props_html:
     span_element = player_prop.find_element(By.XPATH, './div/span[1]')
     span_text = span_element.text
     if any(substring.lower() in span_text.lower() for substring in criteria):
-        player_props.append(span_text)
-print(player_props)
+        span_element.click()
+        #prop = span_element.find_element(By.XPATH, './/span[@class="style_label__3BBxD"]').text
+        #line = span_element.find_element(By.XPATH, './/span[@class="style_price__3Haa9"]').text
+        print(player_prop)
+        # Extract over and under values from button's title attribute
+        #over_under_text = button.get_attribute('title')
+        #over, under = over_under_text.split[1].split()
+        # Split prop to get player and prop
+        #player, prop = prop.split(' ', 1)
+        # Append the extracted information to the DataFrame
+        #df = df.append({'Player': player, 'Prop': prop, 'Line': line, 'Over': over, 'Under': under}, ignore_index=True)
+# print(df)
+time.sleep(5)
 
 
 
