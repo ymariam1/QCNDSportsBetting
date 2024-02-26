@@ -8,50 +8,52 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from helper import *
 import time
 
 driver1 = webdriver.Chrome()
 # driver2 = webdriver.Chrome()
-
+pinnacle_data = []
 # Scrape True Value Odds
 driver1.get("https://www.pinnacle.com/en/basketball/matchups/")
+# Click button to view bets on first NBA game
 viewPropBtn = WebDriverWait(driver1, 10).until(
     EC.element_to_be_clickable((By.CLASS_NAME, "style_btn__3I6l1"))
 )
-# Click the first instance of the button
 viewPropBtn.click()
-div_elements = WebDriverWait(driver1, 10).until(
-    EC.presence_of_all_elements_located((By.XPATH, '//div[@data-collapsed="true" and @data-test-id="Collapse" and contains(@class, "style_marketGroup")]'))
+#Clicks on button to view only player props
+player_props_btn = WebDriverWait(driver1,10).until(
+    EC.element_to_be_clickable((By.ID,"player-props"))
 )
-df = pd.DataFrame(columns=['Player', 'Prop', 'Line', 'Over', 'Under'])
-player_props_html = []
-player_props = []
-criteria = [
-    "(Points)","(Pts+Rebs+Asts)","(Rebounds)", "(3 Point FG)","(Assists)","(Double+Double)","(Triple+Double)"
-    ]
+player_props_btn.click()
 
+
+#Looks at all the props and stores them in div_elements
+main_cont = driver1.find_element("xpath",'/html/body/div[2]/div[1]/div[2]/main/div[3]')
+div_elements = main_cont.find_elements("xpath",'.//div[@data-test-id="Collapse"]')
 for div_element in div_elements:
-    # Find the nested span element
-    span_element = div_element.find_element(By.XPATH, '//div/span')
-    # Get the text content of the span element
-    # Check if the text content meets the criteria
-    player_props_html.append(div_element)
-for player_prop in player_props_html:
-    span_element = player_prop.find_element(By.XPATH, './div/span[1]')
-    span_text = span_element.text
-    if any(substring.lower() in span_text.lower() for substring in criteria):
-        span_element.click()
-        #prop = span_element.find_element(By.XPATH, './/span[@class="style_label__3BBxD"]').text
-        #line = span_element.find_element(By.XPATH, './/span[@class="style_price__3Haa9"]').text
-        print(player_prop)
-        # Extract over and under values from button's title attribute
-        #over_under_text = button.get_attribute('title')
-        #over, under = over_under_text.split[1].split()
-        # Split prop to get player and prop
-        #player, prop = prop.split(' ', 1)
-        # Append the extracted information to the DataFrame
-        #df = df.append({'Player': player, 'Prop': prop, 'Line': line, 'Over': over, 'Under': under}, ignore_index=True)
-# print(df)
+    # Extract player name and prop from the span element
+    player_prop = div_element.find_element("xpath",'.//span').text
+    player, prop = player_prop.split('(')
+    
+    # Extract the buttons for Over and Under
+    over_button = div_element.find_element("xpath",'.//button[contains(@title, "Over")]')
+    under_button = div_element.find_element("xpath",'.//button[contains(@title, "Under")]')
+    
+    # Extract line, over, and under values from buttons
+    line = over_button.get_attribute('title').split()[1]
+    over = over_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
+    under = under_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
+
+    [tOver,tUnder] = devig(over, under)
+
+    
+    # Append the extracted information to the DataFrame
+    pinnacle_data.append({'Player': player.strip(), 'Prop': prop[:-1].strip(), 'Line': line, 'Over': over, 'Under': under, 'True Over': tOver, 'True Under': tUnder})
+df = pd.DataFrame(pinnacle_data)
+# Print the DataFrame
+print(df)
+
 time.sleep(5)
 
 
