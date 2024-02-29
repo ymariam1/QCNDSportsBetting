@@ -9,9 +9,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from helper import *
-import time
+import os
 
+API_KEY = os.getenv('API_KEY')
 driver = webdriver.Chrome()
+
 pinnacle_data = []
 # Scrape True Value Odds
 driver.get("https://www.pinnacle.com/en/basketball/nba/matchups/#period:0")
@@ -30,6 +32,9 @@ for url in urls:
     EC.element_to_be_clickable((By.ID,"player-props"))
 )
     player_props_btn.click()
+    # Collects the name of one of the teams playing
+    team_element = driver.find_element(By.XPATH, './/div[contains(@class, "style_participantNameWrapper__3EvTm")]//label[@class="style_participantName__2BGgO"]')
+    team = team_shorten(team_element.text)
     main_cont = driver.find_element("xpath",'/html/body/div[2]/div[1]/div[2]/main/div[3]')
     div_elements = main_cont.find_elements("xpath",'.//div[@data-test-id="Collapse"]')
     for div_element in div_elements:
@@ -44,13 +49,21 @@ for url in urls:
 
         # Extract line, over, and under values from buttons
         line = over_button.get_attribute('title').split()[1]
-        over = over_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
-        under = under_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
+        try:
+            over = over_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
+        except Exception as e:
+            over = 0
 
-        [tOver,tUnder] = devig(over, under)
-        pinnacle_data.append(store_data(player, prop, line, over, under, tOver, tUnder))
+        try:
+            under = under_button.find_element("xpath",'.//span[@class="style_price__3Haa9"]').text
+        except Exception as e:
+            under = 0
+        tOver,tUnder = devig(over, under)
+        pinnacle_data.append(store_data(team, player, prop, line, over, under, tOver, tUnder))
 true_vals = pd.DataFrame(pinnacle_data)
-print(true_vals)
+print(true_vals.to_markdown())
 
 
-driver.get("https://unabated.com/nba/props")
+
+
+
