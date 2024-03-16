@@ -1,1 +1,5 @@
 .env
+api_response.json
+apiData.csv
+.gitignore
+pinnacle_data.csv
