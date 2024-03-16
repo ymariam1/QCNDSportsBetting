@@ -27,8 +27,8 @@ def store_data(team, player, prop, line, over, under, true_over, true_under):
         'Line': line,
         'Over': over,
         'Under': under,
-        'True Over': true_over,
-        'True Under': true_under
+        'tOver': true_over,
+        'tUnder': true_under
     }
 def team_shorten(team):
     # Shorten team name to match with unabated team names
@@ -70,3 +70,14 @@ def find_button_with_text(driver, text):
     return WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{text}')]"))
     )
+
+def propToMarket(prop):
+    player_prop_map = {'3 Point FG': "player_threes",
+     'Assists': "player_assists",
+     'Points': "player_points",
+     'Pts+Rebs+Asts': "player_points_rebounds_assists",
+     'Rebounds': "player_rebounds",
+    'Double+Double': "player_double_double",
+    'Triple+Double': "player_triple_double"
+    }
+    return player_prop_map.get(prop, "Unknown")
