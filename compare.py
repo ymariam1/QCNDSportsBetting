@@ -18,8 +18,6 @@ props = api_data['Prop'].unique()
 arb_opps = []
 merged_data = pd.merge(api_data,pinnacle_data, on=['Player', 'Prop'], suffixes=('_api', '_pinnacle'))
 merged_data = merged_data.drop_duplicates()
-
-
 for player in players:
     for prop in props:
         comp_data = []
@@ -32,5 +30,5 @@ for player in players:
             if len(pinnacle_line) > 0:
                 comp_data.append(row)
         comp_data = pd.DataFrame(comp_data)
-    if not comp_data.empty:
-        print(comp_data)
+        if not comp_data.empty:
+            print(comp_data)
