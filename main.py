@@ -14,8 +14,7 @@ import os
 
 API_KEY = os.getenv('API_KEY')
 driver = webdriver.Chrome()
-props = ['player_threes', 'player_assists', 'player_points',
- 'player_points_rebounds_assists', 'player_rebounds']
+props = ['player_assists', 'player_points','player_rebounds']
 pinnacle_data = []
 # Scrape True Value Odds
 driver.get("https://www.pinnacle.com/en/basketball/nba/matchups/#period:0")

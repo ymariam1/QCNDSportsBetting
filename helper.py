@@ -18,6 +18,19 @@ def devig(over, under):
     true_under = impU/(impO+impU)
     return [true_over, true_under]
 
+def findPercent(over, under):
+    over = float(over)
+    under = float(under)
+    # Finds implied odds for over/under
+    if (over != 0 and under != 0):
+        impO = (100/over) / 100
+        impU = (100/under) / 100
+    else:
+        return [0,0]
+    return [impO, impU]
+
+    
+
 def store_data(team, player, prop, line, over, under, true_over, true_under):
     # Append the data to the list as a dictionary
     return {
@@ -81,3 +94,23 @@ def propToMarket(prop):
     'Triple+Double': "player_triple_double"
     }
     return player_prop_map.get(prop, "Unknown")
+
+def simplify_props(prop):
+    player_prop_map = {
+        'player_assists': "Assists",
+        'player_points': 'Points',
+        'player_threes': 'Threes',
+        "player_rebounds": "Rebounds",
+        "player_points_rebounds_assists": "P+A+R",
+        "player_double_double": "Double double",
+        "player_triple_double": "Triple double"
+    }
+    return player_prop_map.get(prop, "Unkown")
+
+def findEv(odds, tprob, bet):
+    ev = bet*odds*tprob
+    return ev
+
+def calcKcrit(wprob, lprob, odds):
+    kcrit = wprob - (lprob/odds)
+    return kcrit

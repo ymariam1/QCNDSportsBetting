@@ -92,7 +92,7 @@ for event in filtered_response:
                     line_value = outcome["point"]
                 
                 # Print the formatted output
-                true_over,true_under = devig(over_price, under_price)
+                true_over,true_under = findPercent(over_price, under_price)
                 api_data_list.append({
                             'Book Maker': bookmaker_title,
                             'Player': player,
@@ -100,8 +100,8 @@ for event in filtered_response:
                             'Line': line_value,
                             'Over': over_price,
                             'Under': under_price,
-                            'tOver': true_over,
-                            'tUnder': true_under
+                            'impOver': true_over,
+                            'impUnder': true_under
                 })
 api_data = pd.DataFrame(api_data_list)
 csv_file = "apiData.csv"

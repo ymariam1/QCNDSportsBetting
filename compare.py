@@ -12,6 +12,7 @@ import os
 
 api_data = pd.read_csv("apiData.csv")
 pinnacle_data = pd.read_csv("pinnacle_data.csv")
+pinnacle_data = pinnacle_data.drop(columns=['Team'])
 
 players = api_data['Player'].unique()
 props = api_data['Prop'].unique()
@@ -26,9 +27,24 @@ for player in players:
     # Extract the API line and pinnacle line for the current row
             api_line = row['Line_api']
             pinnacle_line = pinnacle_data.loc[(pinnacle_data['Player'] == row['Player']) & (pinnacle_data['Prop'] == row['Prop']), 'Line'].values
-            # Check if the API line matches the pinnacle line
             if len(pinnacle_line) > 0:
+                row['Prop'] = simplify_props(row['Prop'])
                 comp_data.append(row)
         comp_data = pd.DataFrame(comp_data)
         if not comp_data.empty:
-            print(comp_data)
+            comparison = comp_data[(comp_data['tOver'] > comp_data['impOver']) | (comp_data['tUnder'] > comp_data['impUnder'])]
+            if not comparison.empty:
+                if (comparison['tOver'] > comparison['impOver']).any():
+                    print("Over")
+                    comparison.loc[:, 'ev'] = findEv(comparison['Under_api'], comparison['tOver'], 100)
+                    comparison.loc[:,'kelly'] = calcKcrit(comparison['tOver'], comparison['tUnder'], comparison['Over_api'])
+                elif (comparison['tUnder'] > comparison['impUnder']).any():
+                    print("Under")
+                    comparison.loc[:,'ev'] = findEv(comparison['Under_api'], comparison['tOver'], 100)
+                    comparison.loc[:,'kelly'] = calcKcrit(comparison['tOver'], comparison['tUnder'], comparison['Under_api'])
+                if (comparison['ev'] > 100).any():
+                    print(comparison)
+                
+
+            
+
