@@ -97,20 +97,54 @@ def propToMarket(prop):
 
 def simplify_props(prop):
     player_prop_map = {
-        'player_assists': "Assists",
-        'player_points': 'Points',
-        'player_threes': 'Threes',
-        "player_rebounds": "Rebounds",
+        'player_assists': "assists",
+        'player_points': 'points',
+        'player_threes': 'threes',
+        "player_rebounds": "rebounds",
         "player_points_rebounds_assists": "P+A+R",
         "player_double_double": "Double double",
         "player_triple_double": "Triple double"
     }
     return player_prop_map.get(prop, "Unkown")
 
-def findEv(odds, tprob, bet):
-    ev = bet*odds*tprob
+def findEv(row):
+    win_multiplier = otm(row['price'])
+    
+    true_prob = row['tOver'] if row['direction'] == 'Over' else row['tUnder']
+    
+    ev = (true_prob * (win_multiplier - 1)) - (1 - true_prob)
     return ev
+    
+def calcKelly(row):
+    decimal_odds = otm(row['price'])
+    b = decimal_odds - 1
+    p = row['tOver'] if row['direction'] == 'Over' else row['tUnder']
+    q = 1 - p
+    
+    f = (b * p - q) / b if b != 0 else 0
+    
+    f = max(min(f, 1), 0)
+    return f
 
-def calcKcrit(wprob, lprob, odds):
-    kcrit = wprob - (lprob/odds)
-    return kcrit
+def americanOdds(odds):
+    if odds != 100:
+        prob = ((-1*odds)/((-1*(odds))+100))
+    else:
+        return 0.5
+    return prob
+
+def dta(odds):
+    if odds == 1:
+        return None
+    elif odds >= 2:
+        aodds = (odds-1)*100
+    else:
+        aodds = (-100)/(odds-1)
+    return aodds
+
+def otm(odds):
+    if odds > 0:
+        return odds / 100 + 1
+    else:
+        return 100 / abs(odds) + 1
+    

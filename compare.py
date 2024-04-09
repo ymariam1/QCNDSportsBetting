@@ -8,7 +8,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from helper import *
-import os
 
 api_data = pd.read_csv("apiData.csv")
 pinnacle_data = pd.read_csv("pinnacle_data.csv")

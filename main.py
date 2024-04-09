@@ -63,6 +63,7 @@ for url in urls:
             under = 0
         tOver,tUnder = devig(over, under)
         if prop in props:
+            prop = simplify_props(prop)
             pinnacle_data.append(store_data(team, player, prop, line, over, under, tOver, tUnder))
 
 
